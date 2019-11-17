@@ -1,3 +1,9 @@
+###################################################################
+# Copyright C 2019 Ronaldson Bellande and Sam Pickell
+# Last Modified November 17, 2019
+#
+# Linear Regression based DMP as implemented by Ronaldson Bellande
+###################################################################
 import numpy as np
 import math as m
 import copy
