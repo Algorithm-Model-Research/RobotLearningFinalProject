@@ -99,7 +99,7 @@ class DMP(object):
     def blackbox(self):
 
         for i in range (self.g):
-            cost = ((self.X).mean)
+            cost = self.evaluate((self.X).mean)
 
             samples = self.X
 
