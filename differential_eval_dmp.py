@@ -2,15 +2,16 @@
 # Copyright (C) 2019 Ronaldson Bellande and Sam Pickell
 # Last Modified November 17, 2019
 #
-# Linear Regression based DMP as implemented by Ronaldson Bellande
+# Black box optimized DMP, using linreg_dmp as a base, as referenced from:
+# https://github.com/stulp/dmpbbo
 ###################################################################
+
 import numpy as np
 import math as m
 import copy
 from array import array
 import matplotlib.pyplot as plot
 from sklearn.linear_model import Ridge
-
 
 
 class DMP(object):
@@ -28,10 +29,13 @@ class DMP(object):
         self.step = 0.1                                          #The amount of steps in taken in a particular time frame
 
         #for x in range(len(step)):
-        self.time = np.arange(self.x0,self.g,self.step)          #position of each step in the x axis in term of time
+        #exploration curve
+        self.time = np.arange(self.x0,self.g,self.step)           #position of each step in the x axis in term of time
 
-        #amplitude of the sine curve of a variable like time, that will be the value y; it is also collecting samples at te same time
+        #amplitude of the sine curve of a variable like time, that will be the value y; it is also collecting samples at the same time
+        #learning curve
         self.X = np.sin(self.time)                               #position
+
         self.k = 100
         self.d = 2.0 * np.sqrt(self.k)
         self.w = w
@@ -41,6 +45,11 @@ class DMP(object):
 
         self.l = 1000.0
         self.b = 20.0 / np.pi
+
+        #blackbox inplementation
+        self.evaluate = [np.linalg.norm(-)]
+        self.cost =
+
 
 
 
@@ -85,6 +94,21 @@ class DMP(object):
         f = np.dot(self.w, self._features())
 
         return f
+
+    # New to differential_eval.py, trying to implement blackbox optimization
+    def blackbox(self):
+
+        for i in range (self.g):
+            cost = ((self.X).mean)
+
+            samples = self.X
+
+
+
+
+
+
+
 
     def reproduction(self, o = None, shape = True, avoidance=False, verbose=0):
 
