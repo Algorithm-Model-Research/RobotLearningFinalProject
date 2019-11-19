@@ -5,7 +5,7 @@
 # Black box optimized DMP, using linreg_dmp as a base, as referenced from:
 # https://github.com/stulp/dmpbbo
 ###################################################################
-
+#
 import numpy as np
 import math as m
 import copy
