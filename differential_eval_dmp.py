@@ -1,18 +1,10 @@
-###################################################################
-# Copyright (C) 2019 Ronaldson Bellande and Sam Pickell
-# Last Modified November 17, 2019
-#
-# Black box optimized DMP, using linreg_dmp as a base, as referenced from:
-# https://github.com/stulp/dmpbbo
-###################################################################
-#
 import numpy as np
 import math as m
 import copy
 from array import array
 import matplotlib.pyplot as plot
 from sklearn.linear_model import Ridge
-
+import cma
 
 class DMP(object):
 
@@ -29,30 +21,21 @@ class DMP(object):
         self.step = 0.1                                          #The amount of steps in taken in a particular time frame
 
         #for x in range(len(step)):
-        #exploration curve
-        self.time = np.arange(self.x0,self.g,self.step)           #position of each step in the x axis in term of time
+        self.time = np.arange(self.x0,self.g,self.step)          #position of each step in the x axis in term of time
 
-        #amplitude of the sine curve of a variable like time, that will be the value y; it is also collecting samples at the same time
-        #learning curve
+        #amplitude of the sine curve of a variable like time, that will be the value y; it is also collecting samples at te same time
         self.X = np.sin(self.time)                               #position
-
         self.k = 100
         self.d = 2.0 * np.sqrt(self.k)
         self.w = w
+
+        self.BlackBox = cma.fmin(self.w, self.x0)
 
         #converges
         self.start = self.d / 3  # where it starts converges to 0 but won't equal 0
 
         self.l = 1000.0
         self.b = 20.0 / np.pi
-
-        #blackbox inplementation
-        self.evaluate = [np.linalg.norm(-)]
-        self.cost =
-
-
-
-
 
 #####################################################
         #     Implimentation DMP Learning          #
@@ -67,6 +50,7 @@ class DMP(object):
     def converges(self):
 
         phases = np.exp(-self.start * (((np.linspace(0, 1, len(self.time))))))
+        #print(phases)
         return phases #it displays the exponential converges
 
     def duplicate(self):
@@ -80,6 +64,7 @@ class DMP(object):
 
             temp[:F.shape[0],:F.shape[1]] = F
             design = np.array([self._features() for self.s in self.converges()])
+            print(design)
             lr = Ridge(alpha=1.0, fit_intercept=False)
             lr.fit(design, temp)
             self.w = lr.coef_
@@ -95,36 +80,21 @@ class DMP(object):
 
         return f
 
-    # New to differential_eval.py, trying to implement blackbox optimization
-    def blackbox(self):
-
-        for i in range (self.g):
-            cost = self.evaluate((self.X).mean)
-
-            samples = self.X
-
-
-
-
-
-
-
-
     def reproduction(self, o = None, shape = True, avoidance=False, verbose=0):
 
-        if verbose <= 1:
-            print("Trajectory with x0 = %s, g = %s, self.step=%.2f, step=%.3f" % (self.x0, self.g, self.step, self.step))
+        #if verbose <= 1:
+            #print("Trajectory with x0 = %s, g = %s, self.step=%.2f, step=%.3f" % (self.x0, self.g, self.step, self.step))
 
         #puts evething that was from X to x; from array to matrix
         x = copy.copy(self.X)
         temp_matrix_of_x1 = copy.copy(x)
         temp_matrix_of_x2 = copy.copy(x)
-        X = [copy.copy(self.X)]
+
         original_matrix_1 = [copy.copy(temp_matrix_of_x1)]
         original_matrix_2 = [copy.copy(temp_matrix_of_x2)]
 
         #reproducing the x-asis
-        t = 0.5 * self.step
+        t = 0.1 * self.step
         ti = 0
 
         S = self.converges()
@@ -140,17 +110,17 @@ class DMP(object):
             # the weighted shape base on the movement
             f = self.shape_path() if shape else 0.
             C = self.step.obstacle(o, x, temp_matrix_of_x1) if avoidance else 0.0
-            temp_matrix_of_x2 = ()
-            print(temp_matrix_of_x2)
+
+            #print(temp_matrix_of_x2)
 
             #Everything that you implemented in the  matrix that was temperary will initialize will be put into the none temperary matrix
-            if ti % self.step == 0:
-                self.X = np.append(copy.copy(x),copy.copy(self.X))
+            if ti % self.step > 0:
+                temp_matrix_of_x1 = np.append(copy.copy(x),copy.copy(self.X))
                 original_matrix_1 = np.append(copy.copy(self.X),copy.copy(temp_matrix_of_x1))
                 original_matrix_2 = np.append(copy.copy(self.X),copy.copy(temp_matrix_of_x2))
 
             #return the matrix as array when returning
-            return np.array(self.X), np.array(x), np.array(temp_matrix_of_x2)
+            return np.array(self.X), np.array(x), np.array(original_matrix_1)
 
 
     def obstacle(self, o, original_matrix_1):
