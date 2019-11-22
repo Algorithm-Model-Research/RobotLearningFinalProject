@@ -178,8 +178,8 @@ def main():
     plot.plot(dmp.time,array2)
     plot.axhline(y=0, color='red')
 
-    array1_c = np.sin(array3)
-    plot.plot(dmp.time,array3)
+    #  array1_c = np.sin(array3)
+    #  plot.plot(dmp.time,array3)
     plot.axhline(y=0, color='purple')
     plot.show()
 
