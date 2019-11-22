@@ -1,16 +1,9 @@
-###################################################################
-# Copyright (C) 2019 Ronaldson Bellande and Sam Pickell
-# Last Modified November 17, 2019
-#
-# Linear Regression based DMP as implemented by Ronaldson Bellande
-###################################################################
 import numpy as np
 import math as m
 import copy
 from array import array
 import matplotlib.pyplot as plot
 from sklearn.linear_model import Ridge
-
 
 
 class DMP(object):
@@ -41,9 +34,6 @@ class DMP(object):
 
         self.l = 1000.0
         self.b = 20.0 / np.pi
-
-
-
 
 #####################################################
         #     Implimentation DMP Learning          #
@@ -95,12 +85,12 @@ class DMP(object):
         x = copy.copy(self.X)
         temp_matrix_of_x1 = copy.copy(x)
         temp_matrix_of_x2 = copy.copy(x)
-        X = [copy.copy(self.X)]
+
         original_matrix_1 = [copy.copy(temp_matrix_of_x1)]
         original_matrix_2 = [copy.copy(temp_matrix_of_x2)]
 
         #reproducing the x-asis
-        t = 0.5 * self.step
+        t = 0.1 * self.step
         ti = 0
 
         S = self.converges()
@@ -116,17 +106,17 @@ class DMP(object):
             # the weighted shape base on the movement
             f = self.shape_path() if shape else 0.
             C = self.step.obstacle(o, x, temp_matrix_of_x1) if avoidance else 0.0
-            temp_matrix_of_x2 = ()
+
             print(temp_matrix_of_x2)
 
             #Everything that you implemented in the  matrix that was temperary will initialize will be put into the none temperary matrix
-            if ti % self.step == 0:
-                self.X = np.append(copy.copy(x),copy.copy(self.X))
+            if ti % self.step > 0:
+                temp_matrix_of_x1 = np.append(copy.copy(x),copy.copy(self.X))
                 original_matrix_1 = np.append(copy.copy(self.X),copy.copy(temp_matrix_of_x1))
                 original_matrix_2 = np.append(copy.copy(self.X),copy.copy(temp_matrix_of_x2))
 
             #return the matrix as array when returning
-            return np.array(self.X), np.array(x), np.array(temp_matrix_of_x2)
+            return np.array(self.X), np.array(x), np.array(original_matrix_1)
 
 
     def obstacle(self, o, original_matrix_1):
@@ -188,8 +178,8 @@ def main():
     plot.plot(dmp.time,array2)
     plot.axhline(y=0, color='red')
 
-    #array1_c = np.sin(array3)
-    #plot.plot(dmp.time,array3)
+    array1_c = np.sin(array3)
+    plot.plot(dmp.time,array3)
     plot.axhline(y=0, color='purple')
     plot.show()
 
