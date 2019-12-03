@@ -6,14 +6,57 @@ import matplotlib.pyplot as plot
 from sklearn.linear_model import Ridge
 import cma
 
+import turtle
+from turtle import *
+
+#  Create screen and turtle variables
+out_screen = Screen()
+my_turtle = Turtle("turtle")
+my_turtle.speed(-1)
+
+#  Create two lists to store X and Y coordinates
+x_coords = []
+y_coords = []
+
+#  Draw function
+def turtle_draw(x, y):
+    my_turtle.ondrag(None)
+    my_turtle.setheading(my_turtle.towards(x, y))
+    my_turtle.goto(x, y)
+    my_turtle.ondrag(turtle_draw)
+
+    #  Ensure 0 is always positive
+    if(x == -0.0):
+        x = 0.0
+
+    #  Append the x coordinate to the end of the list
+    x_coords.append(x)
+
+    #  Ensure 0 is always positive
+    if(y == -0.0):
+        y = 0.0
+
+    #  Append the y coordinate to the end of the list
+    y_coords.append(y)
+
+#  The main function
+def test_turtle():
+    turtle.listen()
+
+    my_turtle.ondrag(turtle_draw)
+
+    out_screen.mainloop()
+
+test_turtle()
+print('X coordinates: ', x_coords)
+print('Y coordinates: ', y_coords)
+
 class DMP(object):
 
-    def __init__(self,w, pastor_mod = False):
-
+    def __init__(self,w,x_coords,y_coords, pastor_mod = False):
 ####################################################
         #             Data Collection              #
         ############################################
-
         self.pastor_mod = pastor_mod
         #initial values
         self.x0 = 0                                              #initial position
@@ -29,13 +72,19 @@ class DMP(object):
         self.d = 2.0 * np.sqrt(self.k)
         self.w = w
 
-        self.BlackBox = cma.fmin(self.w, self.x0)
-
         #converges
         self.start = self.d / 3  # where it starts converges to 0 but won't equal 0
 
         self.l = 1000.0
         self.b = 20.0 / np.pi
+        ############################################
+
+        #black-box implementation
+        #self.BlackBox = cma.fmin(self.w, self.x0)
+
+        self.xT = x_coords
+        self.yT = y_coords
+
 
 #####################################################
         #     Implimentation DMP Learning          #
@@ -155,6 +204,8 @@ class DMP(object):
 
 
 def main():
+
+
 #########################################################################################
     #title of the sine curve
     plot.title('Demonstration')
@@ -169,7 +220,11 @@ def main():
 #########################################################################################
 
     w = [None]
-    dmp = DMP(w,True)
+    dmp = DMP(w,x_coords,y_coords,True)
+
+    dmp.x_coords = x_coords
+    dmp.y_coords = y_coords
+
     w = dmp.duplicate()
     dmp.w = w
     array1, array2, array3 = dmp.reproduction(dmp)
@@ -177,6 +232,8 @@ def main():
     array1_a = np.sin(array1)
     plot.plot(dmp.time,array1)
     plot.axhline(y=0, color='green')
+
+    print(dmp.xT)
 
     array1_b = np.sin(array2)
     plot.plot(dmp.time,array2)
