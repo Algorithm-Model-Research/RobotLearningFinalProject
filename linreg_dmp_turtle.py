@@ -74,10 +74,10 @@ class DMP(object):
         self.step = 0.1                                          #The amount of steps in taken in a particular time frame
 
 ####################################################
-        #      Sin function Implementation         #
+        #      Turtle function Implementation         #
         ############################################
         #for x in range(len(step)):
-                               #position
+                                                #position
         self.k = 100
         self.d = 2.0 * np.sqrt(self.k)
         self.w = w
@@ -96,18 +96,9 @@ class DMP(object):
         self.x_asis_for_turtle = x_coords
         self.y_asis_for_turtle = y_coords
 
-####################################################
-        #   Black_Box for sin, turtle and tan      #
-        ############################################
-
-
-        #black-box implementation
-        #self.BlackBox = cma.fmin(self.w, self.x0)
-
-
 
 #########################################################################################################################################################
-        #     Implimentation DMP Learning For Sin Functions       #
+        #     Implimentation DMP Learning For Turtle Functions       #
         ###########################################################
 
     def spring_damping_for_sin(self):
