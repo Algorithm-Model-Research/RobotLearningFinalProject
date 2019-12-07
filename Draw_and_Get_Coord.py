@@ -1,6 +1,6 @@
 ####################################################
 # Copyright (C) Sam Pickell
-# Last Updated November 26, 2019
+# Last Updated December 7, 2019
 # Draw_and_Get_Coord.py
 ####################################################
 #  The following Turtle Graphics implementation was obtained from this tutorial:
@@ -10,6 +10,9 @@
 #  Using Turtle Graphics
 import turtle
 from turtle import *
+
+#  Global variable that sets the number of datapoints to collect
+LOOP_THRESHOLD = 20
 
 #  Create screen and turtle variables
 out_screen = Screen()
@@ -41,8 +44,14 @@ def turtle_draw(x, y):
     #  Append the y coordinate to the end of the list
     y_coords.append(y)
 
+    #  End drawing session after a certain threshold is reached
+    if(len(x_coords) >= LOOP_THRESHOLD):
+        turtle.bye()
+
+
 #  The main function
 def main():
+
     turtle.listen()
 
     my_turtle.ondrag(turtle_draw)
@@ -50,5 +59,5 @@ def main():
     out_screen.mainloop()
 
 main()
-print('X coordinates: ', x_coords)
-print('Y coordinates: ', y_coords)
+print('X coordinates: ', len(x_coords))
+print('Y coordinates: ', len(y_coords))
