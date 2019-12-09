@@ -1,3 +1,9 @@
+####################################################
+# Copyright (C) 2019 Sam Pickell and Ronaldson Bellande
+# Last Updated December 9, 2019
+# pydmp_cmaes.py
+####################################################
+
 import numpy as np
 import math as m
 import copy
@@ -59,6 +65,4 @@ def draw_turtle():
 
     out_screen.mainloop()
 
-draw_turtle()
-print('X coordinates: ', len(x_coords))
-print('Y coordinates: ', len(y_coords))
+#draw_turtle()

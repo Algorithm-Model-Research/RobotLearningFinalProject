@@ -1,6 +1,6 @@
 ####################################################
-# Copyright (C) Sam Pickell
-# Last Updated December 7, 2019
+# Copyright (C) 2019 Sam Pickell
+# Last Updated December 9, 2019
 # Draw_and_Get_Coord.py
 ####################################################
 #  The following Turtle Graphics implementation was obtained from this tutorial:
