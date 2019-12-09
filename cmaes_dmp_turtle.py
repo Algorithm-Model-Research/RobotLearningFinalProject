@@ -184,7 +184,7 @@ class DMP(object):
             temp = np.array(self.y_asis_for_turtle)
 
             #return the matrix as array when returning
-            original_matrix_1 = temp * (self.BlackBox[2] / 150)
+            original_matrix_1 = temp * (self.BlackBox[2] / 500)
 
             #return the matrix as array when returning
             return np.array(self.y_asis_for_turtle), np.array(x), np.array(original_matrix_1)
