@@ -157,7 +157,7 @@ class DMP(object):
             ti += 1
             self.s = S[ti]
 
-            x += temp_matrix_of_x1
+            #x += temp_matrix_of_x1
             temp_matrix_of_x1 += temp_matrix_of_x2
 
             sd = self.spring_damping_for_sin()
@@ -253,7 +253,7 @@ def main():
     plot.axhline(y=0, color='green')
 
     array1_b = np.sin(array2)
-    plot.plot((dmp.x_asis_of_turtle * 2),array2)
+    plot.plot((dmp.x_asis_of_turtle ),array1)
     plot.axhline(y=0, color='red')
 
     array1_c = np.sin(array3)
