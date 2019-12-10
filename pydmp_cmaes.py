@@ -104,8 +104,8 @@ class DMPs_discrete(DMPs):
         #  linear regression - we want to change this to cma_es
 
         # calculate x and psi
-        #x_track = self.cs.rollout()
-        #psi_track = self.gen_psi(x_track)
+        x_track = self.cs.rollout()
+        psi_track = self.gen_psi(x_track)
 
         # efficiently calculate BF weights using weighted linear regression
         #self.w = np.zeros((self.n_dmps, self.n_bfs))
@@ -119,22 +119,13 @@ class DMPs_discrete(DMPs):
         #self.w = np.nan_to_num(self.w)
 
         #  CMA_ES weight calc
+        f_s = np.zeros((self.n_dmps, self.n_bfs))
+        numer = np.sum(x_track * psi_track * f_target)
+        denom = np.sum(x_track * psi_track)
+        f_s = numer/denom
 
-        J = np.sum(np.exp(f_target-find_J(f_target)), 2)
-        #black_box = cma.fmin(cma.ff.fun_as_arg(J), x_track, 0.1))
-
-    def find_J(self, f_target):
-        # calculate x and psi
-        x_track = self.cs.rollout()
-        psi_track = self.gen_psi(x_track)
-        self.j = np.zeros((self.n_dmps, self.n_bfs))
-        for d in range(self.n_dmps):
-            for b in range(self.n_bfs):
-                numer = np.sum(x_track * psi_track[:, b] * f_target[:, d])
-                denom = np.sum(x_track**2 * psi_track[:, b])
-                self.j[d, b] = numer / denom
-        self.j = np.nan_to_num(self.w)
-        return self.j
+        J = np.sum(np.exp(f_target-f_s), 2)
+        black_box = cma.fmin(cma.ff.fun_as_arg(J), x_track, 0.1)
 
 # ==============================
 # Test code
