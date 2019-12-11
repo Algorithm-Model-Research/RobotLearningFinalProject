@@ -128,11 +128,9 @@ class DMPs_discrete(DMPs):
         f_s = np.nan_to_num(f_s)
 
         #  CMA_ES weight calc
-        J = np.zeros((self.n_dmps, self.n_bfs))
-        for d in range(self.n_dmps):
-            for b in range(self.n_bfs):
-                J[d, b] = np.sum((f_target[:, d]-f_s[d, b])**2)
-        black_box = cma.fmin(cma.ff.fun_as_arg(J), x_track, 0.1)
+        J = np.zeros(self.n_bfs)
+        J = np.sum((f_target-f_s[0])**2)
+        black_box = cma.fmin(cma.objective_function(J), x_track, 0.1)
         self.w = black_box
 
 # ==============================
