@@ -119,7 +119,7 @@ class DMPs_discrete(DMPs):
         #self.w = np.nan_to_num(self.w)
 
         #  Find f_s
-        f_s = np.zeros((self.n_dmps, self.n_bfs))
+        #  f_s = np.zeros((self.n_dmps, self.n_bfs))
         for d in range(self.n_dmps):
             for b in range(self.n_bfs):
                 numer = np.sum(x_track * psi_track[:, b] * f_target[:, d])
