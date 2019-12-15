@@ -118,23 +118,22 @@ class DMPs_discrete(DMPs):
                 #self.w[d, b] = numer / (k * denom)
         #self.w = np.nan_to_num(self.w)
 
-        self.w = np.zeros((self.n_dmps, self.n_bfs))
+        #  CMA_ES weight calc
         for d in range(self.n_dmps):
-            #spatial scaling term
-            k = (self.goal[d] - self.y0[d])
             for b in range(self.n_bfs):
                 numer = np.sum(x_track * psi_track[:, b] * f_target[:, d])
                 denom = np.sum(x_track**2 * psi_track[:, b])
-                self.w[d, b] = numer / (k * denom)
-        self.w = np.nan_to_num(self.w)
+        f_s = numer / denom
 
-        #  CMA_ES weight calc
-        #numer = np.sum(x_track * psi_track * f_target)
-        #denom = np.sum(x_track * psi_track)
-        #f_s = numer/denom
+        J = 0
+        for x in range(len(f_target)):
+            J += ((f_target[x] - f_s)**2)
 
-        #J = np.sum(np.exp(f_target[x_track]-f_s), 2)
-        #black_box = cma.fmin(cma.ff.fun_as_arg(J), x_track, 0.1)
+        #J = np.sum(np.exp(f_target-f_s), 2)
+        black_box = cma.fmin(cma.ff.fun_as_arg(x_track),x_track,1)
+        #black_box = cma.fmin(cma.ff.fun_as_arg(J),J,x_track)
+        #black_box = cma.CMAEvolutionStrategy(x_track,0.1).optimize(cma.ff.linear)
+        self.w = black_box[1]
 
 # ==============================
 # Test code
