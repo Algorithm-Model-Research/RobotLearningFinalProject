@@ -1,99 +1,26 @@
 #########################################################
+# Copyright (C) 2013 Travis DeWolf
 # Copyright (C) 2019 Sam Pickell and Ronaldson Bellande
 # Last Updated December 9, 2019
 # pydmp_cmaes.py
 #########################################################
 
-#  NOTE we are in the process of trying to implement CMA_ES-based weight calcs
-#  into Travis DeWolf's implementation of DMP. We are currently using both his
-#  DMP code as well as his example code, and by no means do we claim that part
-#  as our own. Please stand by as we continue working on the weight calc section
-
-
-'''
-Copyright (C) 2013 Travis DeWolf
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
+#  NOTE the gen_weights function is based on the work by Travis DeWolf who
+#  made the pydmps library we used after switching from Ronaldson's DMP code.
+#  Included in this file is the work we put in to trying to modify the weight
+#  calculation to use CMA_ES in place of linear regression. Due to a lack of
+#  time and lack of obvious way to separate/calculate the objective function,
+#  and due to the cma "cma.ff.fun_as_arg" command not accepting any objective
+#  function we gave it, we were unsuccessful in getting the code to work and
+#  produce results. We have left only the gen_weights function here rather than
+#  the entire DMP_Discrete class and test code, as it is the only function that
+#  we modified. However, while testing, all that code was here, and worked with
+#  linear regression, but not CMA_ES.
 
 from pydmps.dmp import DMPs
 import cma
 import numpy as np
 
-
-class DMPs_discrete(DMPs):
-    """An implementation of discrete DMPs"""
-
-    def __init__(self, **kwargs):
-        """
-        """
-
-        # call super class constructor
-        super(DMPs_discrete, self).__init__(pattern='discrete', **kwargs)
-
-        self.gen_centers()
-
-        # set variance of Gaussian basis functions
-        # trial and error to find this spacing
-        self.h = np.ones(self.n_bfs) * self.n_bfs**1.5 / self.c / self.cs.ax
-
-        self.check_offset()
-
-    def gen_centers(self):
-        """Set the centre of the Gaussian basis
-        functions be spaced evenly throughout run time"""
-
-        '''x_track = self.cs.discrete_rollout()
-        t = np.arange(len(x_track))*self.dt
-        # choose the points in time we'd like centers to be at
-        c_des = np.linspace(0, self.cs.run_time, self.n_bfs)
-        self.c = np.zeros(len(c_des))
-        for ii, point in enumerate(c_des):
-            diff = abs(t - point)
-            self.c[ii] = x_track[np.where(diff == min(diff))[0][0]]'''
-
-        # desired activations throughout time
-        des_c = np.linspace(0, self.cs.run_time, self.n_bfs)
-
-        self.c = np.ones(len(des_c))
-        for n in range(len(des_c)):
-            # finding x for desired times t
-            self.c[n] = np.exp(-self.cs.ax * des_c[n])
-
-    def gen_front_term(self, x, dmp_num):
-        """Generates the diminishing front term on
-        the forcing term.
-        x float: the current value of the canonical system
-        dmp_num int: the index of the current dmp
-        """
-        return x * (self.goal[dmp_num] - self.y0[dmp_num])
-
-    def gen_goal(self, y_des):
-        """Generate the goal for path imitation.
-        For rhythmic DMPs the goal is the average of the
-        desired trajectory.
-        y_des np.array: the desired trajectory to follow
-        """
-
-        return np.copy(y_des[:, -1])
-
-    def gen_psi(self, x):
-        """Generates the activity of the basis functions for a given
-        canonical system rollout.
-        x float, array: the canonical system state or path
-        """
-
-        if isinstance(x, np.ndarray):
-            x = x[:, None]
-        return np.exp(-self.h * (x - self.c)**2)
 
     def gen_weights(self, f_target):
         """Generate a set of weights over the basis functions such
@@ -134,64 +61,3 @@ class DMPs_discrete(DMPs):
         #black_box = cma.fmin(cma.ff.fun_as_arg(J),J,x_track)
         #black_box = cma.CMAEvolutionStrategy(x_track,0.1).optimize(cma.ff.linear)
         self.w = black_box[1]
-
-# ==============================
-# Test code
-# ==============================
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-
-    # test normal run
-    dmp = DMPs_discrete(dt=.05, n_dmps=1, n_bfs=10, w=np.zeros((1, 10)))
-    y_track, dy_track, ddy_track = dmp.rollout()
-
-    plt.figure(1, figsize=(6, 3))
-    plt.plot(np.ones(len(y_track))*dmp.goal, 'r--', lw=2)
-    plt.plot(y_track, lw=2)
-    plt.title('DMP system - no forcing term')
-    plt.xlabel('time (ms)')
-    plt.ylabel('system trajectory')
-    plt.legend(['goal', 'system state'], loc='lower right')
-    plt.tight_layout()
-
-    # test imitation of path run
-    plt.figure(2, figsize=(6, 4))
-    n_bfs = [10, 30, 50, 100, 10000]
-
-    # a straight line to target
-    path1 = np.sin(np.arange(0, 1, .01)*5)
-    # a strange path to target
-    path2 = np.zeros(path1.shape)
-    path2[int(len(path2) / 2.):] = .5
-
-    for ii, bfs in enumerate(n_bfs):
-        dmp = DMPs_discrete(n_dmps=2, n_bfs=bfs)
-
-        dmp.imitate_path(y_des=np.array([path1, path2]))
-        # change the scale of the movement
-        dmp.goal[0] = 3
-        dmp.goal[1] = 2
-
-        y_track, dy_track, ddy_track = dmp.rollout()
-
-        plt.figure(2)
-        plt.subplot(211)
-        plt.plot(y_track[:, 0], lw=2)
-        plt.subplot(212)
-        plt.plot(y_track[:, 1], lw=2)
-
-    plt.subplot(211)
-    a = plt.plot(path1 / path1[-1] * dmp.goal[0], 'r--', lw=2)
-    plt.title('DMP imitate path')
-    plt.xlabel('time (ms)')
-    plt.ylabel('system trajectory')
-    plt.legend([a[0]], ['desired path'], loc='lower right')
-    plt.subplot(212)
-    b = plt.plot(path2 / path2[-1] * dmp.goal[1], 'r--', lw=2)
-    plt.title('DMP imitate path')
-    plt.xlabel('time (ms)')
-    plt.ylabel('system trajectory')
-    plt.legend(['%i BFs' % i for i in n_bfs], loc='lower right')
-
-    plt.tight_layout()
-    plt.show()
