@@ -21,7 +21,7 @@ class DMP(object):
         self.step = 0.1                                          #The amount of steps in taken in a particular time frame
 
 ####################################################
-        #      Sin function Implementation         #
+        #      Tan function Implementation         #
         ############################################
         #for x in range(len(step)):
         self.x_asis_of_tan = np.arange(self.x0,self.goal,self.step)          #position of each step in the x axis in term of time
@@ -38,7 +38,7 @@ class DMP(object):
         self.b = 20.0 / np.pi
 
 #########################################################################################################################################################
-        #     Implimentation DMP Learning For Sin Functions       #
+        #     Implimentation DMP Learning For Tan Functions       #
         ###########################################################
 
     def spring_damping_for_tan(self):
